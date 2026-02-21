@@ -1207,7 +1207,7 @@ def generate_cloud(messages, tools):
     contents = [m["content"] for m in messages if m["role"] == "user"]
     start = time.time()
 
-    for model_name in ["gemini-2.5-flash-lite", "gemini-2.0-flash-lite", "gemini-2.5-flash", "gemini-2.0-flash"]:
+    for model_name in ["gemini-3-flash-preview", "gemini-2.5-flash-lite", "gemini-2.0-flash-lite", "gemini-2.5-flash", "gemini-2.0-flash"]:
         try:
             resp = client.models.generate_content(
                 model=model_name,

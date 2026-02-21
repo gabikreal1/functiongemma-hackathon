@@ -238,6 +238,49 @@ for chunk in chunks:
     print(f"Score: {chunk['score']:.2f} - {chunk['text'][:100]}...")
 ```
 
+## FieldKey: Voice-First Locksmith Field Assistant
+
+FieldKey is a native macOS app that demonstrates all three judging rubrics: hybrid edge/cloud routing, end-to-end function calling for real locksmith workflows, and low-latency voice-to-action via Cactus Whisper transcription.
+
+### Architecture
+
+```
+Flutter macOS App  <--HTTP-->  FastAPI (server.py)  -->  main.py generate_hybrid
+     |                              |                         |
+  Voice recording            Whisper transcribe         FunctionGemma (on-device)
+  UI + action cards          Audio conversion (ffmpeg)  Gemini Flash (cloud fallback)
+  Hold-to-speak mic          Mock tool execution        Keyword fallback + enrichment
+```
+
+### 7 Locksmith Tools
+| Tool | Source | Description |
+|------|--------|-------------|
+| `diagnose_lock_fault` | Edge | Diagnose lock/door hardware faults |
+| `log_service_report` | Edge | Log completed service reports |
+| `generate_checklist` | Edge | Generate pre-job safety checklists |
+| `lookup_part` | Edge | Look up parts, key blanks, hardware |
+| `schedule_followup` | Edge | Schedule customer follow-ups |
+| `contact_dispatch` | Edge | Contact dispatch for backup |
+| `generate_invoice` | Cloud | Generate PDF invoices (cloud-routed) |
+
+### Running
+
+```bash
+# Terminal 1: Start backend
+pip install fastapi uvicorn python-multipart fpdf2 google-genai
+python server.py
+
+# Terminal 2: Start Flutter app
+cd fieldkey_app && flutter run -d macos
+```
+
+### Key Features
+- **Voice-to-action**: Hold mic, speak command, get instant tool execution via on-device Whisper + FunctionGemma
+- **Hybrid routing**: On-device FunctionGemma for speed, Gemini Flash 3 cloud fallback for complex tasks
+- **Argument enrichment**: Regex extraction fills in missing args regardless of which model produced the tool call
+- **Interactive UI**: Domain-specific action cards (checklists with checkboxes, invoices with PDF download, dispatch with urgency badges)
+- **PDF invoices**: Real PDF generation with FieldKey branding, served via FastAPI
+
 ## Next steps:
 - Join the [Reddit channel](https://www.reddit.com/r/cactuscompute/), ask any technical questions there.
-- To gain some technical insights on AI, checkout [Maths, CS & AI Compendium](https://github.com/HenryNdubuaku/maths-cs-ai-compendium). 
+- To gain some technical insights on AI, checkout [Maths, CS & AI Compendium](https://github.com/HenryNdubuaku/maths-cs-ai-compendium).
